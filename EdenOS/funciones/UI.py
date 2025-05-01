@@ -1,7 +1,8 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout, QLabel
-from PyQt5.QtCore import QTimer, QTime
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import QTimer, QTime, Qt
+from PyQt5.QtGui import QFont, QCursor
+
 
 class PantallaCompletaApp(QWidget):
     def __init__(self):
@@ -9,7 +10,10 @@ class PantallaCompletaApp(QWidget):
         self.setWindowTitle("UI")
         self.initUI()
         self.pantalla_principal() # Mostrar la pantalla principal al inicio
+        
+        #dev 
         #self.showFullScreen() # Mostrar la ventana en pantalla completa
+        #self.setCursor(QCursor(Qt.BlankCursor)) # Ocultar el cursor
     def initUI(self):
         self.layout_principal = QGridLayout()
         self.setLayout(self.layout_principal)
