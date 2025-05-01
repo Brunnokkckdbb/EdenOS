@@ -1,68 +1,64 @@
-# UI.py
-import kivy
-from kivy.app import App
-from kivy.uix.button import Button
-from kivy.core.window import Window
-from kivy.uix.floatlayout import FloatLayout
-from kivy.clock import Clock
-from datetime import datetime
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout
+from PyQt5.QtCore import QTimer, QTime
+from PyQt5.QtGui import QFont
 
-kivy.require('2.0.0')
+class PantallaCompletaApp(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Pantalla Completa App")
+        # self.showFullScreen() # Descomentar para pantalla completa
+        self.initUI()
 
-class PantallaCompletaApp(App):
-    def build(self):
-        #Window.fullscreen = True
-
-        self.layout = FloatLayout()
+    def initUI(self):
+        grid = QGridLayout()
+        self.setLayout(grid)
 
         botones_info = [
-            {'text': 'Izquierda Centro', 'pos_hint': {'x': 0.05, 'y': 0.43}},
-            {'text': 'Izquierda 3/4',    'pos_hint': {'x': 0.05, 'y': 0.13}},
-            {'text': 'Izquierda arriba', 'pos_hint': {'x': 0.05, 'y': 0.75}},
-            {'text': 'Centro Centro',    'pos_hint': {'x': 0.4,  'y': 0.30}},
-            {'text': 'Derecha Centro',   'pos_hint': {'x': 0.75, 'y': 0.43}},
-            {'text': 'Derecha 3/4',      'pos_hint': {'x': 0.75, 'y': 0.13}},
+            {'text': 'Izquierda Centro', 'row': 1, 'col': 0},
+            {'text': 'Izquierda 3/4',    'row': 2, 'col': 0},
+            {'text': 'Izquierda arriba', 'row': 0, 'col': 0},
+            {'text': 'Centro Centro',    'row': 1, 'col': 1},
+            {'text': 'Derecha Centro',   'row': 1, 'col': 2},
+            {'text': 'Derecha 3/4',      'row': 2, 'col': 2},
         ]
 
         # Crear y añadir los botones
         for info in botones_info:
-            boton = Button(
-                text=info['text'],
-                size_hint=(0.2, 0.1),
-                pos_hint=info['pos_hint'],
-                font_size=22
-            )
-            boton.bind(on_press=self.accion_boton)
-            self.layout.add_widget(boton)
+            boton = QPushButton(info['text'], self)
+            boton.setFont(QFont('Arial', 22))
+            boton.clicked.connect(self.accion_boton)
+            grid.addWidget(boton, info['row'], info['col'])
 
         # Crear el "botón-reloj"
-        self.boton_reloj = Button(
-            text=self.obtener_hora(),
-            size_hint=(0.2, 0.1),
-            pos_hint={'x': 0.75, 'y': 0.75},
-            font_size=28,
-            background_color=(0.2, 0.2, 0.2, 1),  # Un gris oscuro
-            color=(1, 1, 1, 1)  # Texto blanco
-        )
-        self.boton_reloj.bind(on_press=self.accion_reloj)
-        self.layout.add_widget(self.boton_reloj)
+        self.boton_reloj = QPushButton(self.obtener_hora(), self)
+        self.boton_reloj.setFont(QFont('Arial', 28))
+        self.boton_reloj.setStyleSheet("background-color: #333; color: white;") # Un gris oscuro
+        self.boton_reloj.clicked.connect(self.accion_reloj)
+        grid.addWidget(self.boton_reloj, 0, 2)
 
         # Actualizar el texto del reloj cada segundo
-        Clock.schedule_interval(self.actualizar_reloj, 1)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.actualizar_reloj)
+        self.timer.start(1000)
 
-        return self.layout
+        self.setGeometry(300, 300, 800, 600) # Establecer un tamaño inicial para la ventana
 
     def obtener_hora(self):
-        return datetime.now().strftime('%H:%M:%S')
+        return QTime.currentTime().toString('hh:mm:ss')
 
-    def actualizar_reloj(self, dt):
-        self.boton_reloj.text = self.obtener_hora()
+    def actualizar_reloj(self):
+        self.boton_reloj.setText(self.obtener_hora())
 
-    def accion_boton(self, instance):
-        print(f'¡{instance.text} presionado!')
+    def accion_boton(self):
+        boton = self.sender()
+        print(f'¡{boton.text()} presionado!')
 
-    def accion_reloj(self, instance):
+    def accion_reloj(self):
         print("¡Reloj presionado! Puedes hacer algo aquí si quieres.")
 
 if __name__ == '__main__':
-    PantallaCompletaApp().run()
+    app = QApplication(sys.argv)
+    ex = PantallaCompletaApp()
+    ex.show()
+    sys.exit(app.exec_())
